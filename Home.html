@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل العملات</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4ff;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        select, input[type="number"], button {
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .amount-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .amount-container input {
+            width: 70%;
+        }
+
+        .currency-switch {
+            width: 28%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .currency-switch:hover {
+            background-color: #0056b3;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 25px;
+            font-size: 20px;
+            color: #28a745;
+        }
+
+        .whatsapp-button {
+            display: inline-block;
+            background-color: #25d366;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .whatsapp-button:hover {
+            background-color: #1ebe57;
+        }
+
+        .receipt {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-align: right; /* محاذاة النص إلى اليمين */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>تحويل العملات</h1>
+
+        <label for="operationType">اختر نوع العملية:</label>
+        <select id="operationType" onchange="updateFields()">
+            <option value="deposit">إيداع</option>
+            <option value="withdraw">سحب</option>
+        </select>
+
+        <label for="transactionType">اختر نوع التحويل:</label>
+        <select id="transactionType">
+            <option value="redotpay">Redotpay ID</option>
+            <option value="binance">Binance ID</option>
+        </select>
+
+        <label id="paymentMethodLabel" for="paymentMethod">اختر طريقة الدفع:</label>
+        <select id="paymentMethod">
+            <option value="instapay">انستا باي</option>
+            <option value="wallet">المحافظ الإلكترونية "تحويل كاش"</option>
+            <option value="fawry">كارت فوري الاصفر</option>
+            <option value="telda">فيزا تيلدا</option>
+            <option value="nexta">فيزا نكستا</option>
+        </select>
+
+        <label for="amountInput">أدخل المبلغ:</label>
+        <div class="amount-container">
+            <input type="number" id="amountInput" placeholder="أدخل المبلغ" step="0.01">
+            <button id="currencySwitch" class="currency-switch" onclick="switchCurrency()">التبديل إلى الدولار</button>
+        </div>
+
+        <button onclick="calculate()">احسب</button>
+
+        <div id="result" class="result"></div>
+        <div id="receipt" class="receipt"></div> <!-- حقل الإيصال المبدئي -->
+        <div id="whatsappLink" class="result"></div>
+    </div>
+
+    <script>
+        const depositExchangeRate = 51; // سعر الدولار عند الإيداع
+        const withdrawExchangeRate = 48; // سعر الدولار عند السحب
+        let isCurrencyEGP = true; // تحديد العملة الافتراضية
+
+        function switchCurrency() {
+            const currencySwitch = document.getElementById('currencySwitch');
+            const amountInput = document.getElementById('amountInput');
+
+            if (isCurrencyEGP) {
+                currencySwitch.innerText = "التبديل إلى الجنيه";
+                if (amountInput.value) {
+                    amountInput.value = (amountInput.value / depositExchangeRate).toFixed(2); // تحويل المبلغ إلى الدولار
+                }
+            } else {
+                currencySwitch.innerText = "التبديل إلى الدولار";
+                if (amountInput.value) {
+                    amountInput.value = (amountInput.value * depositExchangeRate).toFixed(2); // تحويل المبلغ إلى الجنيه
+                }
+            }
+
+            isCurrencyEGP = !isCurrencyEGP;
+        }
+
+        function updateFields() {
+            document.getElementById('result').innerText = '';
+            document.getElementById('whatsappLink').innerHTML = '';
+            document.getElementById('receipt').innerText = ''; // إعادة تعيين الإيصال
+        }
+
+        function calculate() {
+            const amountInput = document.getElementById('amountInput');
+            const amount = parseFloat(amountInput.value);
+            const operationType = document.getElementById('operationType').value;
+            const transactionType = document.getElementById('transactionType').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            if (isNaN(amount) || amount <= 0) {
+                alert("يرجى إدخال مبلغ صحيح.");
+                return;
+            }
+
+            let exchangeRate = operationType === 'deposit' ? depositExchangeRate : withdrawExchangeRate; // اختيار سعر الصرف المناسب
+            let amountInUSD = isCurrencyEGP ? amount / exchangeRate : amount; // إذا كان بالجنيه، تحويل إلى الدولار
+            const amountInEGP = amountInUSD * exchangeRate; // حساب المبلغ بالجنيه
+
+            const resultText = `تم حساب ${amountInUSD.toFixed(2)} دولار بنجاح.`;
+            document.getElementById('result').innerText = resultText;
+
+            // إعداد الإيصال المبدئي
+            const receiptText = `المبلغ الذي ستحصل عليه: <strong>${amountInEGP.toFixed(2)} جنيه مصري</strong> (ما يعادل <strong>${amountInUSD.toFixed(2)} دولار</strong>)`;
+            document.getElementById('receipt').innerHTML = receiptText; // عرض الإيصال
+
+            const receiptUrl = `receipt.html?amount=${encodeURIComponent(amountInUSD.toFixed(2))}&amountInEGP=${encodeURIComponent(amountInEGP.toFixed(2))}&operationType=${encodeURIComponent(operationType)}&transactionType=${encodeURIComponent(transactionType)}&paymentMethod=${encodeURIComponent(paymentMethod)}`;
+            
+            document.getElementById('whatsappLink').innerHTML = `<a href="${receiptUrl}" class="whatsapp-button">تواصل معي عبر WhatsApp</a>`;
+        }
+    </script>
+
+</body>
+</html>

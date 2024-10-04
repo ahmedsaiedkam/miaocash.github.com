@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيصال التحويل</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4ff;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+
+        .receipt {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-align: right; /* محاذاة النص إلى اليمين */
+        }
+
+        .bold {
+            font-weight: bold; /* جعل النص غامق */
+        }
+
+        .whatsapp-button {
+            display: inline-block;
+            background-color: #25d366;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .whatsapp-button:hover {
+            background-color: #1ebe57;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>إيصال التحويل</h1>
+        <div id="receipt" class="receipt"></div>
+        <a id="whatsappLink" class="whatsapp-button" href="#">تواصل معي عبر WhatsApp</a>
+    </div>
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const amountInUSD = getQueryParam('amount');
+        const amountInEGP = getQueryParam('amountInEGP');
+        const operationType = getQueryParam('operationType');
+        const transactionType = getQueryParam('transactionType');
+        const paymentMethod = getQueryParam('paymentMethod');
+
+        const receiptText = `
+            <p>نوع العملية: <span class="bold">${operationType}</span></p>
+            <p>نوع التحويل: <span class="bold">${transactionType}</span></p>
+            <p>طريقة الدفع: <span class="bold">${paymentMethod}</span></p>
+            <p>المبلغ بالدولار: <span class="bold">${amountInUSD} دولار</span></p>
+            <p>المبلغ بالجنيه المصري: <span class="bold">${amountInEGP} جنيه</span></p>
+        `;
+
+        document.getElementById('receipt').innerHTML = receiptText;
+
+        // إعداد رابط WhatsApp
+        const phoneNumber = "123456789"; // استبدل برقم هاتفك
+        const message = `إيصال تحويل:\nنوع العملية: ${operationType}\nنوع التحويل: ${transactionType}\nطريقة الدفع: ${paymentMethod}\nالمبلغ: ${amountInUSD} دولار\nالمبلغ بالجنيه: ${amountInEGP} جنيه`;
+        const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+        document.getElementById('whatsappLink').setAttribute('href', whatsappLink);
+    </script>
+
+</body>
+</html>
